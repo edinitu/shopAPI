@@ -2,6 +2,7 @@ package com.example.shop.entities;
 
 import com.example.shop.exceptions.BadRequestException;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,20 +12,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Shop implements Serializable {
 
-  private enum KnownCategory {
-    FRUIT,
-    VEGETABLES,
-    COSMETICS,
-    CLOTHES,
-    DAIRY
-  }
+  @JsonIgnore
+  private final Map<String, Integer> categoryMaxQuantityMapping = Map.of(
+    "fruits", 5,
+    "vegetables", 5,
+    "cosmetics", 10,
+    "clothes", 10,
+    "dairy", 15
+  );
 
   private final static String shopName = "Application Shop";
   private final ConcurrentHashMap<Long, Product> products;
+  private final ConcurrentHashMap<String, Long> nameToIdMap;
   private long lastProductIndex = 0;
 
   public Shop() {
     this.products = new ConcurrentHashMap<>();
+    this.nameToIdMap = new ConcurrentHashMap<>();
   }
 
   public String getShopName() {
@@ -32,23 +36,24 @@ public class Shop implements Serializable {
   }
 
   public void addProduct(Product product) throws BadRequestException {
-    try {
-      KnownCategory category = KnownCategory.valueOf(product.getCategory().toUpperCase());
-    } catch (IllegalArgumentException e) {
-      throw new BadRequestException(e.getMessage());
+    if (!this.categoryMaxQuantityMapping.containsKey(product.getCategory().toLowerCase())) {
+      throw new BadRequestException("Category " + product.getCategory() + " unknown");
     }
-    product.setProductId(++lastProductIndex);
+
+    if (product.getProductId() == null) {
+      product.setProductId(++lastProductIndex);
+    }
+
     this.products.put(product.getProductId(), product);
+    this.nameToIdMap.put(product.getName(), product.getProductId());
   }
 
-  public List<Product> getProductsByName(String name) {
-    List<Product> productsWithName = new ArrayList<>();
-    for (Map.Entry<Long, Product> entry: this.products.entrySet()) {
-      if (entry.getValue().getName().equals(name)) {
-        productsWithName.add(entry.getValue());
-      }
+  public Product getProductByName(String name) {
+    Long id = this.nameToIdMap.get(name);
+    if (id != null) {
+      return this.products.get(id);
     }
-    return productsWithName;
+    return null;
   }
 
   public List<Product> getProducts() {

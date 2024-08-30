@@ -37,8 +37,8 @@ public class ShopServiceImpl implements ShopService {
 
   @Override
   public void addProduct(Product product) throws ProductAlreadyExistsException, BadRequestException {
-    List<Product> alreadyExistingProducts = this.shop.getProductsByName(product.getName());
-    if (alreadyExistingProducts.stream().anyMatch(p -> p.equals(product))) {
+    Product alreadyExistingProduct = this.shop.getProductByName(product.getName());
+    if (alreadyExistingProduct != null) {
       throw new ProductAlreadyExistsException(String.format("Product %s already exists", product));
     }
 
@@ -60,6 +60,9 @@ public class ShopServiceImpl implements ShopService {
 
   }
 
+  /**
+   * Inner class that handles the file persistence. Will try and write the shop data to a file every minute.
+   */
   public class FileWriteManager implements Runnable {
     private final FileService fileService;
     private final Shop shop;

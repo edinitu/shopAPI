@@ -6,6 +6,9 @@ import com.example.shop.exceptions.BadRequestException;
 import com.example.shop.exceptions.ProductAlreadyExistsException;
 import com.example.shop.exceptions.ProductDoesNotExistException;
 import com.example.shop.services.ShopService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ShopController {
 
   private final ShopService shopService;
+  private final static Logger logger = Logger.getLogger(ShopController.class.getSimpleName());
 
   public ShopController(ShopService shopService) {
     this.shopService = shopService;
@@ -41,6 +45,7 @@ public class ShopController {
   public ResponseEntity<Product> addProduct(@RequestBody Product product)
       throws ProductAlreadyExistsException, BadRequestException {
     shopService.addProduct(product);
+    prettyPrintLog(HttpMethod.POST, "/shop/product", product.toString());
     return new ResponseEntity<>(product, HttpStatus.CREATED);
   }
 
@@ -65,6 +70,11 @@ public class ShopController {
   @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR,
       reason="Server error")
   @ExceptionHandler(Exception.class)
-  public void internalError() {
+  public void internalError(Exception ex) {
+    logger.log(Level.SEVERE, ex.getMessage());
+  }
+
+  private void prettyPrintLog(HttpMethod method, String endpoint, String response) {
+    logger.info("\n" + method.name() + " " + endpoint + "\n" + "Response: " + response);
   }
 }
