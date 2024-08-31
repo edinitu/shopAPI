@@ -1,13 +1,9 @@
 package com.example.shop.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import java.io.Serializable;
-import org.springframework.boot.json.GsonJsonParser;
-import org.springframework.boot.json.JacksonJsonParser;
 
 /**
  * DTO class representing a Product.
