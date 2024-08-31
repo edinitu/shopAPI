@@ -4,6 +4,7 @@ import com.example.shop.entities.Product;
 import com.example.shop.entities.Shop;
 import com.example.shop.exceptions.BadRequestException;
 import com.example.shop.exceptions.ProductAlreadyExistsException;
+import com.example.shop.exceptions.ProductDoesNotExistException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,13 +47,18 @@ public class ShopServiceImpl implements ShopService {
   }
 
   @Override
-  public void updateProduct(Product product) {
-
+  public void updateProduct(Product product)
+      throws ProductDoesNotExistException, ProductAlreadyExistsException {
+    this.shop.updateProduct(product);
   }
 
   @Override
-  public void getProduct(String productName) {
-
+  public Product getProduct(String productName) throws ProductDoesNotExistException {
+    Product product = this.shop.getProductByName(productName);
+    if (product == null) {
+      throw new ProductDoesNotExistException("Product with name " + productName + " does not exist in this shop");
+    }
+    return product;
   }
 
   @Override

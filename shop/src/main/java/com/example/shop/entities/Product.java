@@ -13,7 +13,6 @@ import org.springframework.boot.json.JacksonJsonParser;
  * DTO class representing a Product.
  */
 public class Product implements Serializable {
-  @JsonIgnore
   private Long productId;
   private String name;
   private String category;
