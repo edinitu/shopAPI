@@ -15,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +49,19 @@ public class ShopController {
       produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Product> addProduct(@RequestBody Product product)
       throws ProductAlreadyExistsException, BadRequestException {
+    if (Arrays.stream(product.getClass().getDeclaredMethods())
+        .filter(f -> f.getName().contains("get"))
+        .anyMatch(f -> {
+          try {
+            return f.invoke(product) == null;
+          } catch (Exception e) {
+            logger.log(Level.SEVERE, "Could not access object function");
+          }
+          return false;
+        })) {
+      throw new BadRequestException("Should not have null fields");
+    }
+
     shopService.addProduct(product);
     prettyPrintLog(HttpMethod.POST, "/shop/product", product.toString());
     return new ResponseEntity<>(product, HttpStatus.CREATED);
