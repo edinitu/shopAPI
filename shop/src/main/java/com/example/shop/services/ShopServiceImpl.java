@@ -62,8 +62,8 @@ public class ShopServiceImpl implements ShopService {
   }
 
   @Override
-  public void deleteProduct(String productName) {
-
+  public Product deleteProduct(Long productId) throws ProductDoesNotExistException {
+    return this.shop.deleteProduct(productId);
   }
 
   /**

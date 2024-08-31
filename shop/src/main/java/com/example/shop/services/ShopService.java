@@ -21,5 +21,5 @@ public interface ShopService {
 
   Product getProduct(String productName) throws ProductDoesNotExistException;
 
-  void deleteProduct(String productName);
+  Product deleteProduct(Long productId) throws ProductDoesNotExistException;
 }

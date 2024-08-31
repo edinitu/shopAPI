@@ -99,6 +99,16 @@ public class Shop implements Serializable {
     return this.products.values().stream().toList();
   }
 
+  public Product deleteProduct(Long productId) throws ProductDoesNotExistException {
+    Product productToDelete = this.products.get(productId);
+    if (productToDelete == null) {
+      throw new ProductDoesNotExistException("Product with id " + productId + " does not exist");
+    }
+
+    this.products.remove(productId);
+    return productToDelete;
+  }
+
   public void setLastProductIndex(long index) {
     this.lastProductIndex = index;
   }

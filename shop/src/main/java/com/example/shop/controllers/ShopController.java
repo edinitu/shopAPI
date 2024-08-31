@@ -86,6 +86,15 @@ public class ShopController {
     return new ResponseEntity<>(product, HttpStatus.OK);
   }
 
+  @RequestMapping(value="/shop/product/{productId}", method = RequestMethod.DELETE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Product> deleteProduct(@PathVariable("productId") Long productId)
+      throws ProductDoesNotExistException {
+    Product product = shopService.deleteProduct(productId);
+    prettyPrintLog(HttpMethod.DELETE, "/shop/product/" + productId, product.toString());
+    return new ResponseEntity<>(product, HttpStatus.OK);
+  }
+
   @ResponseStatus(value= HttpStatus.BAD_REQUEST,
       reason="Does not exist")
   @ExceptionHandler(BadRequestException.class)
