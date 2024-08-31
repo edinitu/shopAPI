@@ -5,6 +5,7 @@ import com.example.shop.entities.Shop;
 import com.example.shop.exceptions.BadRequestException;
 import com.example.shop.exceptions.ProductAlreadyExistsException;
 import com.example.shop.exceptions.ProductDoesNotExistException;
+import com.example.shop.exceptions.QuantityOverLimitException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +39,8 @@ public class ShopServiceImpl implements ShopService {
   }
 
   @Override
-  public void addProduct(Product product) throws ProductAlreadyExistsException, BadRequestException {
+  public void addProduct(Product product)
+      throws ProductAlreadyExistsException, BadRequestException, QuantityOverLimitException {
     Product alreadyExistingProduct = this.shop.getProductByName(product.getName());
     if (alreadyExistingProduct != null) {
       throw new ProductAlreadyExistsException(String.format("Product %s already exists", product));
@@ -49,7 +51,7 @@ public class ShopServiceImpl implements ShopService {
 
   @Override
   public void updateProduct(Product product)
-      throws ProductDoesNotExistException, ProductAlreadyExistsException {
+      throws ProductDoesNotExistException, ProductAlreadyExistsException, QuantityOverLimitException {
     this.shop.updateProduct(product);
   }
 

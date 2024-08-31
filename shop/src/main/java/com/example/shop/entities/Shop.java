@@ -3,6 +3,7 @@ package com.example.shop.entities;
 import com.example.shop.exceptions.BadRequestException;
 import com.example.shop.exceptions.ProductAlreadyExistsException;
 import com.example.shop.exceptions.ProductDoesNotExistException;
+import com.example.shop.exceptions.QuantityOverLimitException;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
@@ -16,12 +17,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Shop implements Serializable {
 
   @JsonIgnore
-  private final Map<String, Integer> categoryMaxQuantityMapping = Map.of(
-    "fruits", 5,
-    "vegetables", 5,
-    "cosmetics", 10,
-    "clothes", 10,
-    "dairy", 15
+  private final Map<String, Long> categoryMaxQuantityMapping = Map.of(
+    "fruits", 5L,
+    "vegetables", 5L,
+    "cosmetics", 10L,
+    "clothes", 10L,
+    "dairy", 15L
   );
 
   private final static String shopName = "Application Shop";
@@ -38,10 +39,22 @@ public class Shop implements Serializable {
     return shopName;
   }
 
-  public void addProduct(Product product) throws BadRequestException {
+  private void checkQuantity(String category, Long quantity) throws QuantityOverLimitException {
+    if (category == null || quantity == null) {
+      return;
+    }
+    long maxQuantity = this.categoryMaxQuantityMapping.get(category);
+    if (quantity > maxQuantity) {
+      throw new QuantityOverLimitException("Quantity too high: " + quantity + ". Max accepted " + maxQuantity);
+    }
+  }
+
+  public void addProduct(Product product) throws BadRequestException, QuantityOverLimitException {
     if (!this.categoryMaxQuantityMapping.containsKey(product.getCategory().toLowerCase())) {
       throw new BadRequestException("Category " + product.getCategory() + " unknown");
     }
+
+    checkQuantity(product.getCategory(), product.getQuantity());
 
     if (product.getProductId() == null) {
       product.setProductId(++lastProductIndex);
@@ -60,7 +73,7 @@ public class Shop implements Serializable {
   }
 
   public void updateProduct(Product product)
-      throws ProductDoesNotExistException, ProductAlreadyExistsException {
+      throws ProductDoesNotExistException, ProductAlreadyExistsException, QuantityOverLimitException {
     Product productInShop = this.products.get(product.getProductId());
     if (productInShop == null) {
       throw new ProductDoesNotExistException("Could not update product. Id does not exist");
@@ -91,6 +104,8 @@ public class Shop implements Serializable {
     if (product.getQuantity() == null) {
       product.setQuantity(productInShop.getQuantity());
     }
+
+    checkQuantity(product.getCategory(), product.getQuantity());
 
     this.products.put(product.getProductId(), product);
   }

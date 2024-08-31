@@ -5,6 +5,7 @@ import com.example.shop.entities.Shop;
 import com.example.shop.exceptions.BadRequestException;
 import com.example.shop.exceptions.ProductAlreadyExistsException;
 import com.example.shop.exceptions.ProductDoesNotExistException;
+import com.example.shop.exceptions.QuantityOverLimitException;
 import com.example.shop.services.ShopService;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -48,9 +49,9 @@ public class ShopController {
   @RequestMapping(value = "/shop/product", method = RequestMethod.POST,
       produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Product> addProduct(@RequestBody Product product)
-      throws ProductAlreadyExistsException, BadRequestException {
+      throws ProductAlreadyExistsException, BadRequestException, QuantityOverLimitException {
     if (Arrays.stream(product.getClass().getDeclaredMethods())
-        .filter(f -> f.getName().contains("get"))
+        .filter(f -> f.getName().contains("get") && !f.getName().contains("Id"))
         .anyMatch(f -> {
           try {
             return f.invoke(product) == null;
@@ -70,7 +71,7 @@ public class ShopController {
   @RequestMapping(value = "/shop/product", method = RequestMethod.PATCH,
       produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<Product> updateProduct(@RequestBody Product product)
-      throws ProductAlreadyExistsException, BadRequestException, ProductDoesNotExistException {
+      throws ProductAlreadyExistsException, BadRequestException, ProductDoesNotExistException, QuantityOverLimitException {
 
     if (product.getProductId() == null
     || Arrays.stream(product.getClass().getDeclaredMethods())
@@ -112,13 +113,15 @@ public class ShopController {
   @ResponseStatus(value= HttpStatus.BAD_REQUEST,
       reason="Does not exist")
   @ExceptionHandler(BadRequestException.class)
-  public void badRequest() {
+  public void badRequest(BadRequestException e) {
+    logger.log(Level.WARNING, "Bad request: " + e.getMessage());
   }
 
   @ResponseStatus(value= HttpStatus.CONFLICT,
       reason="Data already exists")
   @ExceptionHandler(ProductAlreadyExistsException.class)
-  public void conflict() {
+  public void conflict(ProductDoesNotExistException e) {
+    logger.log(Level.WARNING, "Product already exists. " + e.getMessage());
   }
 
   @ResponseStatus(value= HttpStatus.NOT_FOUND,
@@ -126,6 +129,13 @@ public class ShopController {
   @ExceptionHandler(ProductDoesNotExistException.class)
   public void notExists(ProductDoesNotExistException e) {
     logger.log(Level.WARNING, "Item not found. " + e.getMessage());
+  }
+
+  @ResponseStatus(value= HttpStatus.INSUFFICIENT_STORAGE,
+      reason="Does not exist")
+  @ExceptionHandler(QuantityOverLimitException.class)
+  public void limit(QuantityOverLimitException e) {
+    logger.log(Level.WARNING, "Max quantity exceeded. " + e.getMessage());
   }
 
   @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR,
