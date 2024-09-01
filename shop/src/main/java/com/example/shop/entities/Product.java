@@ -67,7 +67,7 @@ public class Product implements Serializable {
     this.price = price;
   }
 
-  public Boolean getOnSale() {
+  public Boolean getIsOnSale() {
     return isOnSale;
   }
 

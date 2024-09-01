@@ -8,4 +8,6 @@ public interface FileService {
   void loadDataFromFile(Shop shop);
 
   void dumpDataToFile(List<Product> products);
+
+  void setFilePath(String filePath);
 }

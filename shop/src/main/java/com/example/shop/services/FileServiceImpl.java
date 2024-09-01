@@ -19,10 +19,12 @@ import org.springframework.stereotype.Service;
 public class FileServiceImpl implements FileService {
 
   private static final Logger logger = Logger.getLogger(FileServiceImpl.class.getSimpleName());
-  private static final String FILE_PATH = "./data.txt";
+  private static String FILE_PATH;
   private static final String DELIMITER = ",";
 
-  public FileServiceImpl() {}
+  public FileServiceImpl() {
+    FILE_PATH = "./data.txt";
+  }
 
   @Override
   public void loadDataFromFile(Shop shop) {
@@ -71,7 +73,7 @@ public class FileServiceImpl implements FileService {
             + DELIMITER
             + product.getPrice()
             + DELIMITER
-            + product.getOnSale()
+            + product.getIsOnSale()
             + DELIMITER
             + product.getQuantity()
             + "\n";
@@ -80,5 +82,11 @@ public class FileServiceImpl implements FileService {
     } catch (Exception e) {
       logger.log(Level.SEVERE, e.getMessage());
     }
+  }
+
+  // Used just for unit testing
+  @Override
+  public void setFilePath(String filePath) {
+    FILE_PATH = filePath;
   }
 }

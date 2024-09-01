@@ -90,8 +90,8 @@ public class Shop implements Serializable {
       product.setCategory(productInShop.getCategory());
     }
 
-    if (product.getOnSale() == null) {
-      product.setIsOnSale(productInShop.getOnSale());
+    if (product.getIsOnSale() == null) {
+      product.setIsOnSale(productInShop.getIsOnSale());
     }
 
     if (product.getPrice() == null) {

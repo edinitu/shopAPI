@@ -72,7 +72,7 @@ public class ShopController {
 
     if (product.getProductId() == null
     || Arrays.stream(product.getClass().getDeclaredMethods())
-        .filter(f -> f.getName().contains("get"))
+        .filter(f -> f.getName().contains("get") && !f.getName().contains("Id"))
         .allMatch(f -> {
           try {
             return f.invoke(product) == null;
@@ -117,7 +117,7 @@ public class ShopController {
   @ResponseStatus(value= HttpStatus.CONFLICT,
       reason="Data already exists")
   @ExceptionHandler(ProductAlreadyExistsException.class)
-  public void conflict(ProductDoesNotExistException e) {
+  public void conflict(ProductAlreadyExistsException e) {
     logger.log(Level.WARNING, "Product already exists. " + e.getMessage());
   }
 
