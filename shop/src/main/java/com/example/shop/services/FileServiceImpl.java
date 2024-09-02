@@ -26,6 +26,11 @@ public class FileServiceImpl implements FileService {
     FILE_PATH = "./data.txt";
   }
 
+  /**
+   * Loads the lines from a file, builds Product objects from them and adds them to the
+   * provided shop.
+   * @param shop the shop to load the products in
+   */
   @Override
   public void loadDataFromFile(Shop shop) {
     try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
@@ -60,6 +65,10 @@ public class FileServiceImpl implements FileService {
     }
   }
 
+  /**
+   * Writes CSV style lines, describing a Product, to a file for persistence.
+   * @param products the products to persist.
+   */
   @Override
   public void dumpDataToFile(List<Product> products) {
     try (Writer writer = new BufferedWriter(new OutputStreamWriter(

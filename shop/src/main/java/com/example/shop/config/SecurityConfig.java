@@ -15,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+/**
+ * Config class to allow only predefined users to make requests to this service.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -24,6 +27,9 @@ public class SecurityConfig {
     return new BCryptPasswordEncoder();
   }
 
+  /**
+   * Save the in memory hardcoded users.
+   */
   @Bean
   public UserDetailsService users() {
     UserDetails admin = User
@@ -41,6 +47,9 @@ public class SecurityConfig {
     return new InMemoryUserDetailsManager(admin, user);
   }
 
+  /**
+   * Allow only ADMIN users to modify the contents of the Shop.
+   */
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     httpSecurity

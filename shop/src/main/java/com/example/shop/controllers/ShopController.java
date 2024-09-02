@@ -60,6 +60,10 @@ public class ShopController {
       throw new BadRequestException("Should not have null fields");
     }
 
+    if (product.getQuantity() < 1) {
+      throw new BadRequestException("Quantity should be higher or equal to 1");
+    }
+
     shopService.addProduct(product);
     prettyPrintLog(HttpMethod.POST, "/shop/product", product.toString());
     return new ResponseEntity<>(product, HttpStatus.CREATED);
@@ -84,6 +88,9 @@ public class ShopController {
       throw new BadRequestException("Cannot update product with all null values");
     }
 
+    if (product.getQuantity() != null && product.getQuantity() < 1) {
+      throw new BadRequestException("Quantity should be higher or equal to 1");
+    }
     shopService.updateProduct(product);
     prettyPrintLog(HttpMethod.PATCH, "/shop/product", product.toString());
     return new ResponseEntity<>(product, HttpStatus.OK);

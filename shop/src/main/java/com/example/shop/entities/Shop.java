@@ -46,6 +46,13 @@ public class Shop implements Serializable {
     }
   }
 
+  /**
+   * Adds a product to in memory storage. Keep track of both id - product and name - id mappings for
+   * faster access.
+   * @param product the product to add.
+   * @throws BadRequestException if the category is unknown.
+   * @throws QuantityOverLimitException if we try to add a product with a quantity that exceeds the set limit.
+   */
   public void addProduct(Product product) throws BadRequestException, QuantityOverLimitException {
     if (!this.categoryMaxQuantityMapping.containsKey(product.getCategory().toLowerCase())) {
       throw new BadRequestException("Category " + product.getCategory() + " unknown");
@@ -69,6 +76,14 @@ public class Shop implements Serializable {
     return null;
   }
 
+  /**
+   * Updates one or more fields of a product. If the fields are not present, populate them
+   * with the values from the existing product and return the updated object.
+   * @param product the product to update
+   * @throws ProductDoesNotExistException if the id provided does not exist.
+   * @throws ProductAlreadyExistsException if we try to change the name to an already existing one.
+   * @throws QuantityOverLimitException if we try to change the quantity and exceeds the limit.
+   */
   public void updateProduct(Product product)
       throws ProductDoesNotExistException, ProductAlreadyExistsException, QuantityOverLimitException {
     Product productInShop = this.products.get(product.getProductId());
