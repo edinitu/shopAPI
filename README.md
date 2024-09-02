@@ -107,7 +107,10 @@ Response-Body:
 ### 2. File persistence
 Apart from the in memory storage, the API persists the data periodically to a file. If restarted, it loads the data found in the file.
 
-### 3. Restrictions
+### 3. Role based access
+This API has 2 predefined users and Basic Authentication implemented. It can only be accessed by those 2 users with their username and password. Also, only the ADMIN user can modify the shop contents, the basic USER can only view its contents.
+
+### 4. Restrictions
 
  - can only add products with a quantity lower than or equal to predefined values
  - a product is unique by its name - cannot add 2 products with the same name
